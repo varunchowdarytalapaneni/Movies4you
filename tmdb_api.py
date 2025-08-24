@@ -6,7 +6,7 @@ import requests
 import pandas as pd
 from typing import List, Dict, Any
 
-TMDB_API_KEY = "5a1ff503e759ebba1e06e628823"  # Replace with your TMDB API key
+TMDB_API_KEY = "08c9c5a1ff503e759ebba1e06e628823"  # Replace with your TMDB API key
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
 class TMDBApiException(Exception):
