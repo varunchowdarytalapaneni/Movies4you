@@ -2,7 +2,7 @@
 app.py
 Flask app for movie recommendation system.
 """
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template, url_for
 import pandas as pd
 from tmdb_api import fetch_movie_metadata, fetch_movie_reviews, TMDBApiException
 from preprocess import preprocess_reviews
@@ -11,41 +11,7 @@ from recommend import build_content_matrix, hybrid_recommendation
 
 app = Flask(__name__)
 
-HTML_TEMPLATE = '''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Movie Recommendation System</title>
-    <style>
-        body { font-family: Arial; margin: 40px; }
-        .container { max-width: 600px; margin: auto; }
-        input[type=text] { width: 80%; padding: 8px; }
-        input[type=submit] { padding: 8px 16px; }
-        .error { color: red; }
-        ul { list-style: none; padding: 0; }
-        li { margin-bottom: 10px; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h2>Movie Recommendation System</h2>
-    <form method="get" action="/">
-        <input type="text" name="movie" placeholder="Enter a movie name" required>
-        <input type="submit" value="Recommend">
-    </form>
-    {% if error %}<div class="error">{{ error }}</div>{% endif %}
-    {% if recommendations %}
-    <h3>Top 5 Recommendations:</h3>
-    <ul>
-    {% for rec in recommendations %}
-        <li><b>{{ rec.title }}</b> | Similarity: {{ rec.similarity }} | Positive Sentiment: {{ rec.positive_sentiment }}</li>
-    {% endfor %}
-    </ul>
-    {% endif %}
-</div>
-</body>
-</html>
-'''
+import os
 
 # Dummy movie list for demo; in production, fetch a set of movies from TMDB
 MOVIE_TITLES = ["Inception", "The Matrix", "Interstellar", "The Dark Knight", "Fight Club", "Pulp Fiction", "Forrest Gump", "The Shawshank Redemption", "The Godfather", "The Lord of the Rings"]
@@ -101,14 +67,22 @@ def index():
                 else:
                     pos_ratio = 0.0
                 sentiment_scores[m['title']] = pos_ratio
-            recommendations = hybrid_recommendation(movie, movies, tfidf_matrix, sentiment_scores, top_n=5)
+            recs = hybrid_recommendation(movie, movies, tfidf_matrix, sentiment_scores, top_n=5)
+            # Add poster_path for each recommended movie
+            recommendations = []
+            for rec in recs:
+                # Find the movie dict by title
+                movie_data = next((m for m in movies if m['title'] == rec['title']), None)
+                poster_path = movie_data.get('poster_path') if movie_data else ''
+                rec['poster_path'] = poster_path
+                recommendations.append(rec)
             if not recommendations:
                 error = "Movie not found or not enough data."
         except TMDBApiException as e:
             error = str(e)
         except Exception as e:
             error = "Internal server error."
-    return render_template_string(HTML_TEMPLATE, recommendations=recommendations, error=error)
+    return render_template("index.html", recommendations=recommendations, error=error)
 
 if __name__ == "__main__":
     app.run(debug=True)

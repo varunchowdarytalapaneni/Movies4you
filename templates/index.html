@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies4You - Movie Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/netflix.css">
+</head>
+<body>
+    <div class="netflix-bg">
+        <div class="overlay"></div>
+        <div class="container">
+            <h1 class="logo">Movies4You</h1>
+            <form class="search-form" method="get" action="/">
+                <input type="text" name="movie" placeholder="Search for a movie..." value="{{ request.args.get('movie', '') }}" required>
+                <button type="submit"><i class="fas fa-search"></i> Recommend</button>
+            </form>
+            {% if error %}<div class="error">{{ error }}</div>{% endif %}
+            {% if recommendations %}
+            <h2 class="section-title">Top 5 Recommendations</h2>
+            <div class="movie-grid">
+                {% for rec in recommendations %}
+                <div class="movie-card">
+                    <img src="https://image.tmdb.org/t/p/w500{{ rec.poster_path }}" alt="{{ rec.title }} poster" class="movie-poster">
+                    <div class="movie-info">
+                        <h3>{{ rec.title }}</h3>
+                        <div class="scores">
+                            <span class="score sim">Similarity: {{ rec.similarity }}</span>
+                            <span class="score sent">Positive: {{ rec.positive_sentiment }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
