@@ -4,9 +4,14 @@ Functions for fetching movie metadata and reviews from TMDB API.
 """
 import requests
 import pandas as pd
+import os
 from typing import List, Dict, Any
 
+<<<<<<< HEAD
 TMDB_API_KEY = "08c9c5a1ff503e759ebba1e06e628823"  # Replace with your TMDB API key
+=======
+TMDB_API_KEY = os.environ.get("TMDB_API_KEY")
+>>>>>>> dc5df3e (Update tmdb_api.py (local changes before rebase))
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
 class TMDBApiException(Exception):
@@ -48,3 +53,4 @@ def fetch_movie_reviews(movie_id: int) -> pd.DataFrame:
         return df
     except requests.RequestException as e:
         raise TMDBApiException(f"API request failed: {e}")
+

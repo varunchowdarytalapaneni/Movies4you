@@ -74,7 +74,15 @@ def index():
                 # Find the movie dict by title
                 movie_data = next((m for m in movies if m['title'] == rec['title']), None)
                 poster_path = movie_data.get('poster_path') if movie_data else ''
+                backdrop_path = movie_data.get('backdrop_path') if movie_data else ''
+                overview = movie_data.get('overview', '') if movie_data else ''
+                genres = ', '.join([g['name'] for g in movie_data.get('genres', [])]) if movie_data else ''
+                vote_average = movie_data.get('vote_average', '') if movie_data else ''
                 rec['poster_path'] = poster_path
+                rec['backdrop_path'] = backdrop_path
+                rec['overview'] = overview
+                rec['genres'] = genres
+                rec['vote_average'] = vote_average
                 recommendations.append(rec)
             if not recommendations:
                 error = "Movie not found or not enough data."

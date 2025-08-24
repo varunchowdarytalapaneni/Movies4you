@@ -6,36 +6,66 @@
     <title>Movies4You - Movie Recommendations</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/netflix.css">
+    <style>
+        .carousel-item {
+            height: 500px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .carousel-caption {
+            background: rgba(20,20,20,0.7);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .movie-poster {
+            border-radius: 10px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+        }
+    </style>
 </head>
 <body>
     <div class="netflix-bg">
         <div class="overlay"></div>
-        <div class="container">
-            <h1 class="logo">Movies4You</h1>
-            <form class="search-form" method="get" action="/">
+        <div class="container py-5">
+            <h1 class="logo mb-4">Movies4You</h1>
+            <form class="search-form mb-4" method="get" action="/">
                 <input type="text" name="movie" placeholder="Search for a movie..." value="{{ request.args.get('movie', '') }}" required>
                 <button type="submit"><i class="fas fa-search"></i> Recommend</button>
             </form>
             {% if error %}<div class="error">{{ error }}</div>{% endif %}
             {% if recommendations %}
-            <h2 class="section-title">Top 5 Recommendations</h2>
-            <div class="movie-grid">
-                {% for rec in recommendations %}
-                <div class="movie-card">
-                    <img src="https://image.tmdb.org/t/p/w500{{ rec.poster_path }}" alt="{{ rec.title }} poster" class="movie-poster">
-                    <div class="movie-info">
-                        <h3>{{ rec.title }}</h3>
-                        <div class="scores">
-                            <span class="score sim">Similarity: {{ rec.similarity }}</span>
-                            <span class="score sent">Positive: {{ rec.positive_sentiment }}</span>
+            <h2 class="section-title mb-4">Top 5 Recommendations</h2>
+            <div id="movieCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for rec in recommendations %}
+                    <div class="carousel-item {% if loop.index == 1 %}active{% endif %}"
+                         style="background-image: url('https://image.tmdb.org/t/p/original{{ rec.backdrop_path }}');">
+                        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center h-100">
+                            <img src="https://image.tmdb.org/t/p/w300{{ rec.poster_path }}" alt="{{ rec.title }} poster" class="movie-poster mb-3">
+                            <h3>{{ rec.title }}</h3>
+                            <p class="mb-1"><b>Genres:</b> {{ rec.genres }}</p>
+                            <p class="mb-1"><b>Rating:</b> {{ rec.vote_average }}/10</p>
+                            <p class="mb-2"><b>Similarity:</b> <span class="score sim">{{ rec.similarity }}</span> | <b>Positive:</b> <span class="score sent">{{ rec.positive_sentiment }}</span></p>
+                            <p class="movie-overview">{{ rec.overview }}</p>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#movieCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#movieCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
             </div>
             {% endif %}
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
