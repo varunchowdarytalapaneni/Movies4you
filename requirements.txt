@@ -1,0 +1,7 @@
+# requirements.txt
+requests
+pandas
+numpy
+scikit-learn
+nltk
+flask
